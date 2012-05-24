@@ -25,42 +25,6 @@ if [ -n "$force_color_prompt" ]; then
     fi
 fi
 
-BLACK=$(tput setaf 0)
-RED=$(tput setaf 1)
-GREEN=$(tput setaf 2)
-LIME_YELLOW=$(tput setaf 190)
-YELLOW=$(tput setaf 3)
-POWDER_BLUE=$(tput setaf 153)
-BLUE=$(tput setaf 4)
-MAGENTA=$(tput setaf 5)
-CYAN=$(tput setaf 6)
-WHITE=$(tput setaf 7)
-BRIGHT=$(tput bold)
-NORMAL=$(tput sgr0)
-BLINK=$(tput blink)
-REVERSE=$(tput smso)
-UNDERLINE=$(tput smul)
-
-parse_git_branch() {
-        if git rev-parse --git-dir >/dev/null 2>&1
-        then
-                gitver=$(git branch 2>/dev/null| sed -n '/^\*/s/^\* //p')
-                if [ "$1" = "colorless" ]
-                then
-                        gitver='git::'$gitver
-                else
-                        if git diff --quiet 2>/dev/null >&2
-                        then
-                                gitver=${GREEN}'git::'$gitver${NORMAL}
-                        else
-                                gitver=${RED}'git::'$gitver${NORMAL}
-                        fi
-                fi
-        else
-               return 0
-        fi
-        echo -e $gitver
-}
 parse_svn_branch() {
         parse_svn_url | sed -e 's#^'"$(parse_svn_repository_root)"'##g' | awk -F / '{print "svn::"$1 "/" $2 }'
 }
@@ -71,17 +35,29 @@ parse_svn_repository_root() {
         svn info 2>/dev/null | grep -e '^Repository Root:*' | sed -e 's#^Repository Root: *\(.*\)#\1\/#g '
 }
 
+RED=$(tput setaf 1)
+GREEN=$(tput setaf 2)
+CYAN=$(tput setaf 6)
+WHITE=$(tput setaf 7)
+NORMAL=$(tput sgr0)
+
+GIT_PS1_SHOWDIRTYSTATE=1
+GIT_PS1_SHOWSTASHSTATE=1
+GIT_PS1_SHOWUNTRACKEDFILES=1
+GIT_PS1_SHOWUPSTREAM="auto verbose"
+
 if [ "$color_prompt" = yes ]; then
-        PS1="\[${NORMAL}\]\u@\h\[${CYAN}\] \w \[${RED}\]\$(parse_git_branch)\$(parse_svn_branch) \[${WHITE}\]$\[$NORMAL\] "
+		PS1='\[${NORMAL}\]${debian_chroot:+($debian_chroot)}\u@\h\[${CYAN}\] \w \[${RED}\]$(__git_ps1 "git::%s")$(parse_svn_branch) \[${WHITE}\]$\[${NORMAL}\] '
 else
         PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
+		echo
 fi
 unset color_prompt force_color_prompt
 
 # If this is an xterm set the title to user@host:dir
 case "$TERM" in
 xterm*|rxvt*)
-    PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w \$(parse_git_branch colorless)\$(parse_svn_branch)  \a\]$PS1"
+    PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w \$(__git_ps1 'git::%s')\$(parse_svn_branch)  \a\]$PS1"
     ;;
 *)
     ;;
