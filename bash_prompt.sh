@@ -55,7 +55,7 @@ GIT_PS1_SHOWUNTRACKEDFILES=1
 GIT_PS1_SHOWUPSTREAM="auto verbose"
 
 if [ "$color_prompt" = yes ]; then
-		PS1='\[${NORMAL}\]${debian_chroot:+($debian_chroot)}\u@\h\[${CYAN}\] \w \[${RED}\]$(__git_ps1 "git::%s")$(parse_svn_branch) \[${WHITE}\]$\[${NORMAL}\] '
+		PS1='\[${NORMAL}\]${debian_chroot:+($debian_chroot)}\u@\h\[${CYAN}\] \w \[${RED}\]$(__git_ps1 "git::%s")\[${GREEN}\]$(parse_svn_branch) \[${WHITE}\]$\[${NORMAL}\] '
 else
         PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
 		echo
