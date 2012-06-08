@@ -1,4 +1,12 @@
 #!/usr/bin/env bash
+
+# if $TERM is not set, we cannot use colors and other features
+# I observed that this happens during SCP/SFTP, we should just
+# stop processing in those cases
+if [ -z "$TERM" ]; then
+	return;
+fi
+
 ## set variable identifying the chroot you work in (used in the prompt below)
 if [ -z "$debian_chroot" ] && [ -r /etc/debian_chroot ]; then
     debian_chroot=$(cat /etc/debian_chroot)
