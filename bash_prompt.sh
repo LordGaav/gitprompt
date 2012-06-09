@@ -7,6 +7,21 @@ if [ -z "$TERM" ]; then
 	return;
 fi
 
+# Check for color support and set colors
+if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
+    RED=$(tput setaf 1)
+    GREEN=$(tput setaf 2)
+    CYAN=$(tput setaf 6)
+    WHITE=$(tput setaf 7)
+    NORMAL=$(tput sgr0)
+else
+    RED=
+    GREEN=
+    CYAN=
+    WHITE=
+    NORMAL=
+fi
+
 ## set variable identifying the chroot you work in (used in the prompt below)
 if [ -z "$debian_chroot" ] && [ -r /etc/debian_chroot ]; then
     debian_chroot=$(cat /etc/debian_chroot)
@@ -42,12 +57,6 @@ parse_svn_url() {
 parse_svn_repository_root() {
         svn info 2>/dev/null | grep -e '^Repository Root:*' | sed -e 's#^Repository Root: *\(.*\)#\1\/#g '
 }
-
-RED=$(tput setaf 1)
-GREEN=$(tput setaf 2)
-CYAN=$(tput setaf 6)
-WHITE=$(tput setaf 7)
-NORMAL=$(tput sgr0)
 
 GIT_PS1_SHOWDIRTYSTATE=1
 GIT_PS1_SHOWSTASHSTATE=1
