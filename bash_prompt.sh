@@ -7,6 +7,15 @@ if [ -z "$TERM" ]; then
 	return;
 fi
 
+echo "$SHELL" | grep -q bash
+IS_BASH=$?
+
+# this prompt only works properly for bash, so lets just exit if we are
+# running something else
+if [ $IS_BASH -ne 0 ]; then
+	return;
+fi
+
 ## set variable identifying the chroot you work in (used in the prompt below)
 if [ -z "$debian_chroot" ] && [ -r /etc/debian_chroot ]; then
     debian_chroot=$(cat /etc/debian_chroot)
