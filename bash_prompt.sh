@@ -50,13 +50,15 @@ if [ -n "$enable_color_prompt" ]; then
 fi
 
 parse_svn_branch() {
-        parse_svn_url | sed -e 's#^'"$(parse_svn_repository_root)"'##g' | awk -F / '{print "svn::"$1 "/" $2 }'
+	SVN_URL=$(parse_svn_url)
+	if [ -z "$SVN_URL" ]; then return; fi
+	echo "$SVN_URL" | awk -F / '{print "'$(parse_svn_proto)'::" $(NF-1) "/" $NF}'
+}
+parse_svn_proto() {
+	parse_svn_url | awk -F : '{print $1}' | sed -e 's#\(http\|https\)#svn#g'
 }
 parse_svn_url() {
-        svn info 2>/dev/null | grep -e '^URL*' | sed -e 's#^URL: *\(.*\)#\1#g '
-}
-parse_svn_repository_root() {
-        svn info 2>/dev/null | grep -e '^Repository Root:*' | sed -e 's#^Repository Root: *\(.*\)#\1\/#g '
+    svn info 2>/dev/null | grep -e '^URL*' | sed -e 's#^URL: *\(.*\)#\1#g '
 }
 
 GIT_PS1_SHOWDIRTYSTATE=1
